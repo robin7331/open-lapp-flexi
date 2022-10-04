@@ -5,3 +5,13 @@
 @page {
   size: A5;
 }
+
+@media print {
+  body {-webkit-print-color-adjust: exact;}
+  .print-no-bg {
+    background-color: white;
+  }
+  .print-no-shadow {
+    box-shadow: none;
+  }
+}
