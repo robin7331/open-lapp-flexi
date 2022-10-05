@@ -13,6 +13,10 @@ The browser preview is fairly accurate. Still I would recommend printing on a A5
 
 ![header image showing prefilled labels](https://github.com/robin7331/open-lapp-flexi/blob/main/readme/header.jpg?raw=true)
 
+This lets you print onto those labels with your standard laser printer. 
+
+![header image showing the printed labels](https://github.com/robin7331/open-lapp-flexi/blob/main/readme/printes-labels.jpg?raw=true)
+
 ## Features
 
 - To edit a text simply click into a label. The text will turn into a textarea allowing for text input. Once your click away from the field it re-renders it properly.
