@@ -1,8 +1,9 @@
 <template>
   <div
     :style="{ width: computedWidth, height: computedHeight }"
-    class="flex flex-grow bg-lapp-yellow print-no-bg"
-    @click="state.editing = true"
+    class="flex flex-grow bg-lapp-yellow print-no-bg hover:scale-110 transition-all hover:shadow-lg "
+    :class="{'scale-105 shadow-lg trasnsition-all' : props.editing}"
+    @click.capture="$emit('shouldEdit')"
   >
     <div class="flex flex-col justify-around ml-[4.2mm] my-[2.1mm]">
       <div class="bg-white rounded-full" style="height: 1mm; width: 5.7mm" />
@@ -10,30 +11,16 @@
     </div>
 
     <div
-      class="flex flex-1 items-center justify-center h-full mx-1 text-center"
+      class="flex w-full items-center justify-center h-full mx-1 text-center"
     >
-      <div v-if="!state.editing" class="flex flex-col leading-none font-bold space-y-px mb-[0.5mm]">
-        <span class="text-xs whitespace-pre-wrap">{{ firstLine }}</span>
-        <span class="text-2xs whitespace-pre-wrap">{{ secondLine }}</span>
+      <div  class="flex flex-col w-full leading-none font-bold space-y-px mb-[0.5mm]">
+
+        <input v-if="state.editingTitle" ref="titleInput" v-model="data.title" class="bg-green w-full resize-none overflow-hidden box-border text-xs text-center outline-none rounded-sm" @keyup.enter="blur" @keyup.esc="blur" @keydown.tab.prevent="editSubtitle"/>
+        <span v-else class="text-xs hover:underline cursor-pointer resize-none overflow-hidden" @click="editTitle">{{ data.title }}</span>
+        
+        <input v-if="state.editingSubtitle" ref="subtitleInput" v-model="data.subtitle" class="bg-green w-full resize-none overflow-hidden box-border text-2xs text-center outline-none rounded-sm" @keyup.enter="blur" @keyup.esc="blur"  @keydown.tab.prevent="editTitle"/>
+        <span v-else class="text-2xs hover:underline cursor-pointer resize-none overflow-hidden" @click="editSubtitle">{{ data.subtitle }}</span>
       </div>
-      <textarea
-        v-else
-        v-model="text"
-        class="
-          resize-none
-          text-2xs
-          font-bold
-          leading-3
-          bg-transparent
-          box-border
-          text-center
-          w-full
-          overflow-hidden
-          outline-0
-        "
-        :rows="2"
-        @blur="state.editing = false"
-      ></textarea>
     </div>
 
     <div class="flex flex-col justify-around mr-[4.2mm] my-[2.1mm]">
@@ -44,12 +31,15 @@
 </template>
 
 <script setup>
-import { computed, ref } from "vue";
+import { computed, nextTick, ref, watch } from "vue";
 
 const props = defineProps({
   modelValue: {
-    type: String,
-    default: "",
+    type: Object,
+    default: () => ({
+      title: "",
+      subtitle: "",
+    }),
   },
   width: {
     type: Number,
@@ -59,21 +49,38 @@ const props = defineProps({
     type: Number,
     default: null,
   },
+  editing: {
+    type: Boolean,
+    default: false,
+  },
 });
 
-const emit = defineEmits(['update:modelValue']);
+const titleInput = ref(null)
+const subtitleInput = ref(null)
 
-const text = computed({
+const emit = defineEmits(['update:modelValue', 'shouldEdit', 'finishEditing']);
+
+const state = ref({
+  editingTitle: false,
+  editingSubtitle: false,
+});
+
+const data = computed({
   get () {
     return props.modelValue
   },
   set(val) {
-    console.log("Test 123")
     emit('update:modelValue', val);
   }
 })
 
-const state = ref({ editing: false });
+// watch editing
+watch(() => props.editing, (editing) => {
+  if (!editing) {
+    state.value.editingTitle = false
+    state.value.editingSubtitle = false
+  }
+})
 
 // a computed ref
 const computedWidth = computed(() => {
@@ -83,13 +90,28 @@ const computedHeight = computed(() => {
   return `${props.height}mm`;
 });
 
-// make a computed property that returns the first line of state.text
-const firstLine = computed(() => {
-  return text.value?.split("\n")[0] ?? "";
-});
+async function editTitle() {
+  state.value.editingTitle = true
+  state.value.editingSubtitle = false
 
-const secondLine = computed(() => {
-  return text.value?.split("\n")[1] ?? "";
-});
+  await nextTick()
+  titleInput.value.focus()
+  titleInput.value.select()
+}
+
+async function editSubtitle() {
+  state.value.editingTitle = false
+  state.value.editingSubtitle = true
+
+  await nextTick()
+  subtitleInput.value.focus()
+  subtitleInput.value.select()
+}
+
+async function blur() {
+  state.value.editingTitle = false
+  state.value.editingSubtitle = false
+  emit('finishEditing');
+}
 
 </script>
