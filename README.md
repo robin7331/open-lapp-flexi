@@ -15,7 +15,7 @@ The browser preview is fairly accurate. Still I would recommend printing on a A5
 
 This lets you print onto those labels with your standard laser printer. 
 
-![header image showing the printed labels](https://github.com/robin7331/open-lapp-flexi/blob/main/readme/printes-labels.jpeg?raw=true)
+![header image showing the printed labels](https://github.com/robin7331/open-lapp-flexi/blob/main/readme/printed-labels.jpeg?raw=true)
 
 ## Features
 
